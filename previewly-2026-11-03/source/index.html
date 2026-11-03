@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Previewly — publish HTML prototypes</title>
+<meta name="description" content="Upload a ZIP of your static site and get one private link that stays the same across every version.">
+<!-- the theme before first paint: the visitor's choice, else the system's -->
+<script>(function(){var t;try{t=localStorage.getItem('previewly-theme')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;})();</script>
+<meta name="color-scheme" content="light dark">
+<link rel="preload" href="/src/fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<!-- linked here, not imported from main.js, so the page is styled on first paint -->
+<link rel="stylesheet" href="/src/base.css">
+<link rel="stylesheet" href="/src/styles.css">
+<link rel="stylesheet" href="/src/mockups/mockups.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232B6CF6'/%3E%3Ccircle cx='23' cy='9' r='3.5' fill='white'/%3E%3C/svg%3E">
+</head>
+<body class="booting">
+<a class="skip" href="#ship" id="skip">Skip the story</a>
+
+<header class="top">
+  <a class="brand" href="#" id="home" aria-label="Previewly, back to the start"><span class="mark" aria-hidden="true"></span><span>Previewly</span></a>
+  <div class="tools">
+    <button type="button" class="iconbtn" id="sound" aria-pressed="false" aria-label="Sound off">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9.5h3.2L12 5.5v13l-4.8-4H4z"/><path class="wave" d="M15.5 9.2a4 4 0 0 1 0 5.6M18 6.8a7.4 7.4 0 0 1 0 10.4"/><path class="mute" d="M16 9.5l5 5m0-5l-5 5"/></svg>
+    </button>
+    <button type="button" class="iconbtn" id="theme" aria-label="Dark theme" aria-pressed="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><g class="sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.8v2M12 19.2v2M2.8 12h2M19.2 12h2M5.5 5.5l1.4 1.4M17.1 17.1l1.4 1.4M5.5 18.5l1.4-1.4M17.1 6.9l1.4-1.4"/></g><path class="moon" d="M19.5 14.6A8 8 0 0 1 9.4 4.5a8 8 0 1 0 10.1 10.1z"/></svg>
+    </button>
+    <a class="btn" href="view.html">View</a>
+    <a class="cta" href="upload.html"><span>Upload<span class="wide-only"> ZIP</span></span></a>
+  </div>
+</header>
+
+<!-- the pinned URL bar: the same address through every chapter (bar.js). content.js: the URL -->
+<div class="bar" id="bar">
+  <div class="prog" id="barProg" aria-hidden="true"><i class="prog-fill" id="barFill"><b class="prog-glint"></b></i><i class="prog-check" id="barCheck"></i></div>
+  <svg class="lock" id="barLock" viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="11" rx="3" fill="currentColor"/><path id="barShackle" d="M8 10.5V7.5a4 4 0 0 1 7.6-1.8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"/></svg>
+  <div class="url muted" id="barUrl">previewly.cc/<span class="caret"></span></div>
+  <div class="status" id="barStatus"></div>
+</div>
+
+<!-- the side progress rail: one node per chapter, a glowing fill, a tooltip per node (rail.js) -->
+<nav class="rail" id="rail" aria-label="Chapters">
+  <div class="track" aria-hidden="true"><i class="fill" id="railFill"></i><i class="head" id="railHead"></i></div>
+  <ol>
+    <li><button type="button" data-go="0" aria-label="01 Pack: Your work, ready to show"><span class="dot"></span><span class="tip"><b>01</b> Pack</span></button></li>
+    <li><button type="button" data-go="1" aria-label="02 Drop: Unzip, that’s the upload"><span class="dot"></span><span class="tip"><b>02</b> Drop</span></button></li>
+    <li><button type="button" data-go="2" aria-label="03 Host: Live in seconds"><span class="dot"></span><span class="tip"><b>03</b> Host</span></button></li>
+    <li><button type="button" data-go="3" aria-label="04 Protect: Locked when it matters"><span class="dot"></span><span class="tip"><b>04</b> Protect</span></button></li>
+    <li><button type="button" data-go="4" aria-label="05 Update: New version, same link"><span class="dot"></span><span class="tip"><b>05</b> Update</span></button></li>
+    <li><button type="button" data-go="5" aria-label="06 Ship: Send it once"><span class="dot"></span><span class="tip"><b>06</b> Ship</span></button></li>
+  </ol>
+</nav>
+
+<main>
+  <div class="track-scroll" id="scroller">
+    <div class="stage" id="stage">
+      <div class="backdrop" aria-hidden="true"><div class="horizon"></div><div class="halo-rig" id="haloRig"><div class="halo" id="halo"></div></div></div>
+
+      <!-- the art: one 1100×720 frame, scaled to fit above the copy and centred (layout.js); a perspective camera
+           over the sets of every chapter (sets.js, hero.js) -->
+      <div class="frame" id="frame" aria-hidden="true" style="opacity:0">
+        <div class="scene" id="scene"><div class="camera" id="camera"></div></div>
+      </div>
+
+      <!-- page elements over the art -->
+      <div class="ui" id="ui">
+        <div class="counter" id="counter" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span id="counterText">0 / 38 files checked</span></div>
+
+        <!-- chapter 4: keypad. content.js: the passcode, twice -->
+        <div class="keypad" id="keypad" role="group" aria-label="Passcode keypad. The demo code is 2026.">
+          <div class="badge"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="7" y="14" width="18" height="13" rx="3.5"/><path class="shackle" d="M11 14V10.5a5 5 0 0 1 10 0V14"/></svg></div>
+          <h3 id="kpTitle">This preview is private</h3>
+          <p id="kpSub">Enter the 4-digit passcode</p>
+          <div class="dots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+          <div class="keys">
+            <button type="button">1</button><button type="button">2</button><button type="button">3</button>
+            <button type="button">4</button><button type="button">5</button><button type="button">6</button>
+            <button type="button">7</button><button type="button">8</button><button type="button">9</button>
+            <button type="button" class="zero">0</button><button type="button" class="del" aria-label="Delete"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h10.5a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5H9l-6-6z"/><path d="M12.5 9.5l5 5m0-5l-5 5"/></svg></button>
+          </div>
+          <button type="button" class="relock" id="relock">Lock it again</button>
+          <p class="hint">Demo code: 2026</p>
+        </div>
+
+        <!-- chapter 5: the update and the versions. content.js: the dates -->
+        <div class="deploy" id="deploy">
+          <div class="dhead"><span class="zip"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="3"/><path d="M12 3v2m0 2v2m0 2v2"/></svg>northvale-v3.zip</span><span class="pct" id="deployPct">0%</span></div>
+          <div class="dbar"><i id="deployBar"></i></div>
+          <ol class="steps" id="deploySteps">
+            <li>Uploaded</li><li>41 files checked</li><li>Published to the same link</li>
+          </ol>
+        </div>
+        <div class="versions" id="versions" role="group" aria-label="Choose a version">
+          <button type="button" data-ver="1" aria-pressed="false"><b>v1</b> 12 Oct</button>
+          <button type="button" data-ver="2" aria-pressed="false"><b>v2</b> 19 Oct</button>
+          <button type="button" data-ver="3" aria-pressed="true"><b>v3</b> Today</button>
+        </div>
+
+        <!-- chapter 6 -->
+        <span class="toast" id="toast" role="status"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Link copied. Paste it anywhere.</span>
+      </div>
+
+      <!-- copy: centred under the art, one block per chapter (reveal.js) -->
+      <div class="copies" id="copies">
+        <div class="copy" data-ch="0">
+          <p class="eyebrow">01 / 06 — Your prototype</p>
+          <h1>Your work, ready to show.</h1>
+          <p class="lead">A prototype, a landing page, a static site. If it fits in a ZIP, it’s ready for Previewly.</p>
+          <p class="hint"><i aria-hidden="true"></i>Drag the pull, or scroll.</p>
+        </div>
+        <div class="copy" data-ch="1">
+          <p class="eyebrow">02 / 06 — Drop the ZIP</p>
+          <h2>Unzip. That’s the upload.</h2>
+          <p class="lead">Drop one file. Previewly opens it, checks every asset and finds your entry page.</p>
+        </div>
+        <div class="copy" data-ch="2">
+          <p class="eyebrow">03 / 06 — Hosted instantly</p>
+          <h2>Live in seconds. Exactly as built.</h2>
+          <p class="lead">The landing page, the dashboard, the PDF it links to. No config, no build step, served the way you made them.</p>
+        </div>
+        <div class="copy" data-ch="3">
+          <p class="eyebrow">04 / 06 — A private link</p>
+          <h2>One link. Locked when it matters.</h2>
+          <p class="lead">Share a real URL. Add a passcode so only the people you choose can open the preview.</p>
+        </div>
+        <div class="copy" data-ch="4">
+          <p class="eyebrow">05 / 06 — New versions</p>
+          <h2>New version. Same link.</h2>
+          <p class="lead">Upload v2, v3, v12. Everyone you’ve shared with sees the latest, and the URL never changes.</p>
+        </div>
+        <div class="copy" data-ch="5" id="ship">
+          <p class="eyebrow">06 / 06 — Ship it</p>
+          <h2>Send it once. It stays current.</h2>
+          <p class="lead">One link opens on every screen, from a phone to a laptop. Update it whenever you like.</p>
+          <div class="ctas"><a class="cta" href="upload.html">Upload ZIP</a><button type="button" class="btn" data-copy>Copy link</button><button type="button" class="btn ghost" id="replay">Replay</button></div>
+        </div>
+      </div>
+
+      <div class="pull" id="pull" role="slider" tabindex="0" aria-label="Zipper pull" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="Zipped closed"></div>
+      <p class="sr" id="status" aria-live="polite"></p>
+    </div>
+  </div>
+
+</main>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

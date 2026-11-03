@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<!-- @head -->
+<title>Your preview is ready — Previewly</title>
+<meta name="description" content="Your preview’s link, and its passcode when you’re ready to share it.">
+<!-- Upload and My previews ask to log in first: checked before first paint, so the page never shows signed out -->
+<script>(function(){var s;try{s=localStorage.getItem('previewly-session')||sessionStorage.getItem('previewly-session')}catch(e){}if(s)return;var q=new URLSearchParams(location.search),sa=window.__STANDALONE,p=sa?q.get('p'):location.pathname.split('/').pop().replace('.html','');q.delete('p');var n=(p||'upload')+'.html'+(q.toString()?'?'+q:'');location.replace((sa?'?p=login&next=':'login.html?next=')+encodeURIComponent(n));})();</script>
+</head>
+<body class="app">
+<!-- @header -->
+<main id="main" class="page narrow">
+  <section class="panel" id="ready" hidden>
+    <span class="okbadge" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+    <h1>Your preview is ready</h1>
+    <p class="lead" id="what"></p>
+    <div class="field">
+      <span class="label" id="linkLabel">Shared link</span>
+      <div class="linkbox"><span class="linktext" id="link" aria-labelledby="linkLabel"></span><button type="button" class="btn sm" id="copyLink">Copy link</button></div>
+    </div>
+    <div class="field">
+      <span class="label">Expires</span>
+      <p class="value" id="expires"></p>
+    </div>
+    <hr class="rule">
+    <div class="field" id="pass">
+      <h2 class="label">Passcode</h2>
+      <div id="passBefore">
+        <p class="note">Generate the passcode when you are ready to share. It is shown here once — pass it to your viewer yourself.</p>
+        <button type="button" class="cta" id="gen">Generate passcode</button>
+      </div>
+      <div id="passAfter" hidden>
+        <div class="codebox"><span class="code" id="code"></span><button type="button" class="btn sm" id="copyCode">Copy</button></div>
+        <p class="note" id="codeNote"></p>
+      </div>
+    </div>
+    <div class="actions">
+      <a class="btn" href="upload.html">Upload another</a>
+      <a class="btn ghost" href="previews.html" id="toPreviews">My previews</a>
+    </div>
+  </section>
+  <section class="panel" id="missing" hidden>
+    <h1>We couldn’t find that preview</h1>
+    <p class="lead">It may have been uploaded in another browser. Everything you’ve shared from this one is in My previews.</p>
+    <div class="actions"><a class="cta" href="previews.html">My previews</a><a class="btn" href="upload.html">Upload a file</a></div>
+  </section>
+</main>
+<script type="module" src="/src/app/ready.js"></script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<!-- @head -->
+<link rel="stylesheet" href="/src/mockups/mockups.css">
+<title>My previews — Previewly</title>
+<meta name="description" content="Everything you’ve shared: open a file, copy its link, or re-generate its passcode.">
+<!-- Upload and My previews ask to log in first: checked before first paint, so the page never shows signed out -->
+<script>(function(){var s;try{s=localStorage.getItem('previewly-session')||sessionStorage.getItem('previewly-session')}catch(e){}if(s)return;var q=new URLSearchParams(location.search),sa=window.__STANDALONE,p=sa?q.get('p'):location.pathname.split('/').pop().replace('.html','');q.delete('p');var n=(p||'upload')+'.html'+(q.toString()?'?'+q:'');location.replace((sa?'?p=login&next=':'login.html?next=')+encodeURIComponent(n));})();</script>
+</head>
+<body class="app">
+<!-- @header -->
+<main id="main" class="page wide">
+  <div class="pagehead">
+    <div>
+      <h1>My previews</h1>
+      <p class="lead">Everything you have shared. Open a file to see it as your recipients do, or copy its link.</p>
+    </div>
+    <a class="cta" href="upload.html">Upload a file</a>
+  </div>
+  <div class="listbar" id="listbar">
+    <p class="count" id="count"></p>
+    <div class="seg" id="viewAs" role="group" aria-label="Show as">
+      <button type="button" data-view="list" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6.5h11M9 12h11M9 17.5h11"/><circle cx="4.75" cy="6.5" r="1.1"/><circle cx="4.75" cy="12" r="1.1"/><circle cx="4.75" cy="17.5" r="1.1"/></svg>List</button>
+      <button type="button" data-view="grid" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.8"/><rect x="13" y="4" width="7" height="7" rx="1.8"/><rect x="4" y="13" width="7" height="7" rx="1.8"/><rect x="13" y="13" width="7" height="7" rx="1.8"/></svg>Grid</button>
+    </div>
+  </div>
+  <section class="panel flush" id="listView">
+    <table class="tbl" id="tbl">
+      <caption class="sr">Your shared previews, newest first</caption>
+      <thead><tr><th scope="col">File</th><th scope="col">Size</th><th scope="col">Shared on</th><th scope="col">Status</th><th scope="col">Actions</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="empty" id="empty" hidden>
+      <span class="drop-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 15.5V5m0 0L7.8 9.2M12 5l4.2 4.2"/><path d="M4.5 14.5v2.2a2.8 2.8 0 0 0 2.8 2.8h9.4a2.8 2.8 0 0 0 2.8-2.8v-2.2"/></svg></span>
+      <h2>Nothing shared yet</h2>
+      <p>Upload a file to get its link. It’ll be listed here.</p>
+      <a class="cta" href="upload.html">Upload a file</a>
+    </div>
+  </section>
+  <ul class="cards" id="gridView" aria-label="Your shared previews, newest first" hidden></ul>
+  <p class="signed">Signed in as <b id="who"></b>. <button type="button" class="textlink" id="logout">Log out</button></p>
+</main>
+<dialog class="dlg" id="dlg" aria-labelledby="dlgTitle">
+  <div id="dlgAsk">
+    <h2 id="dlgTitle">Re-generate the passcode?</h2>
+    <p class="lead">A new passcode replaces the one for <b class="dlgFile"></b>. The current one stops working, so send the new one to everyone who should still see it.</p>
+    <div class="actions"><button type="button" class="cta" id="dlgGo">Re-generate passcode</button><button type="button" class="btn" id="dlgCancel">Cancel</button></div>
+  </div>
+  <div id="dlgDone" hidden>
+    <h2 id="dlgTitle2">New passcode</h2>
+    <p class="lead">For <b class="dlgFile"></b>.</p>
+    <div class="codebox"><span class="code" id="dlgCode"></span><button type="button" class="btn sm" id="dlgCopy">Copy</button></div>
+    <p class="note">Shown once — copy it now. The previous passcode has stopped working.</p>
+    <div class="actions"><button type="button" class="btn" id="dlgClose">Done</button></div>
+  </div>
+</dialog>
+<script type="module" src="/src/app/previews.js"></script>
+</body>
+</html>

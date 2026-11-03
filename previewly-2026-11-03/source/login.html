@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<!-- @head -->
+<title>Log in — Previewly</title>
+<meta name="description" content="Log in to upload and manage your previews.">
+</head>
+<body class="app">
+<!-- @header -->
+<main id="main" class="page center">
+  <section class="panel login">
+    <h1>Log in</h1>
+    <p class="lead">Welcome back. Enter your details to continue.</p>
+    <form id="form" novalidate>
+      <div class="field">
+        <label class="label" for="email">Email</label>
+        <input class="input" id="email" type="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="you@example.com" aria-describedby="emailErr">
+        <p class="ferr" id="emailErr" hidden></p>
+      </div>
+      <div class="field">
+        <label class="label" for="pw">Password</label>
+        <div class="inputwrap">
+          <input class="input" id="pw" type="password" autocomplete="current-password" placeholder="Enter your password" aria-describedby="pwErr">
+          <button type="button" class="reveal" data-reveal="pw" aria-label="Show" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/><path class="slash" d="M4 4l16 16"/></svg></button>
+        </div>
+        <p class="ferr" id="pwErr" hidden></p>
+      </div>
+      <div class="row between">
+        <label class="check"><input type="checkbox" id="keep"><span>Remember me</span></label>
+        <a href="#" class="textlink" data-todo="Resetting a password isn’t part of this prototype.">Forgot password?</a>
+      </div>
+      <button class="cta lg block" type="submit" id="submit">Log in</button>
+    </form>
+    <hr class="rule">
+    <p class="foot">Don’t have an account? <a href="#" class="textlink" data-todo="Signing up isn’t part of this prototype.">Sign up</a></p>
+  </section>
+  <p class="proto">A prototype: any email and password sign you in, on this browser only.</p>
+</main>
+<script type="module" src="/src/app/login.js"></script>
+</body>
+</html>

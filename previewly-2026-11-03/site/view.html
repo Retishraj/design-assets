@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<!-- the theme before first paint: the visitor's choice, else the system's (as on the landing page) -->
+<script>(function(){var t;try{t=localStorage.getItem('previewly-theme')}catch(e){}if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;})();</script>
+<link rel="preload" href="./assets/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232B6CF6'/%3E%3Ccircle cx='23' cy='9' r='3.5' fill='white'/%3E%3C/svg%3E">
+<title>Open shared document — Previewly</title>
+<meta name="description" content="Open a preview someone shared with you: paste its link, enter its passcode.">
+  <script type="module" crossorigin src="./assets/view.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/theme.js">
+  <link rel="modulepreload" crossorigin href="./assets/store.js">
+  <link rel="modulepreload" crossorigin href="./assets/mockups.js">
+  <link rel="modulepreload" crossorigin href="./assets/render.js">
+  <link rel="stylesheet" crossorigin href="./assets/base.css">
+  <link rel="stylesheet" crossorigin href="./assets/app.css">
+  <link rel="stylesheet" crossorigin href="./assets/mockups.css">
+</head>
+<body class="app">
+<a class="skip" href="#main">Skip to content</a>
+<header class="top app">
+  <a class="brand" href="index.html" aria-label="Previewly, home"><span class="mark" aria-hidden="true"></span><span>Previewly</span></a>
+  <nav class="tools" aria-label="Main">
+    <button type="button" class="iconbtn" id="theme" aria-label="Dark theme" aria-pressed="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><g class="sun"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.8v2M12 19.2v2M2.8 12h2M19.2 12h2M5.5 5.5l1.4 1.4M17.1 17.1l1.4 1.4M5.5 18.5l1.4-1.4M17.1 6.9l1.4-1.4"/></g><path class="moon" d="M19.5 14.6A8 8 0 0 1 9.4 4.5a8 8 0 1 0 10.1 10.1z"/></svg>
+    </button>
+    <a class="navlink" href="previews.html" data-nav="previews" aria-label="My previews">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="3"/><path d="M3.5 9.5h17M8 13.5h8M8 16.5h5"/></svg><span>My previews</span>
+    </a>
+    <a class="btn" href="view.html" data-nav="view">View</a>
+    <a class="cta" href="upload.html" data-nav="upload"><span>Upload<span class="wide-only"> ZIP</span></span></a>
+  </nav>
+</header>
+<!-- one page, four states: paste a link (no ?t=), the passcode, the link gone (expired or unknown), the document -->
+<main id="main" class="page narrow">
+  <section class="panel" id="paste" hidden>
+    <h1>Open shared document</h1>
+    <p class="lead">Paste the link the sender gave you.</p>
+    <form id="pasteForm" novalidate>
+      <div class="field">
+        <label class="label" for="linkIn">Shared link</label>
+        <input class="input" id="linkIn" type="text" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://previewly.cc/view/…" aria-describedby="pasteErr">
+      </div>
+      <div class="alert" id="pasteErr" role="alert" hidden><i aria-hidden="true">!</i><span></span></div>
+      <div class="actions"><button class="cta lg" type="submit" id="pasteGo" disabled>Continue</button></div>
+    </form>
+  </section>
+
+  <section class="panel" id="lock" hidden>
+    <h1>Open shared document</h1>
+    <p class="lead">This document is protected. Enter the passcode the sender gave you.</p>
+    <p class="value" id="lockExp" hidden></p>
+    <form id="lockForm" novalidate>
+      <div class="field">
+        <label class="label" for="code">Passcode</label>
+        <div class="inputwrap">
+          <input class="input code-in" id="code" type="password" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="lockErr">
+          <button type="button" class="reveal" data-reveal="code" aria-label="Show" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/><path class="slash" d="M4 4l16 16"/></svg></button>
+        </div>
+      </div>
+      <div class="alert" id="lockErr" role="alert" hidden><i aria-hidden="true">!</i><span>Something went wrong. Please try again.</span></div>
+      <div class="actions"><button class="cta lg" type="submit" id="lockGo" disabled>View document</button></div>
+    </form>
+  </section>
+
+  <section class="panel" id="gone" hidden>
+    <span class="okbadge off" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></span>
+    <h1 id="goneTitle"></h1>
+    <p class="lead" id="goneLead"></p>
+    <div class="actions"><a class="btn" href="view.html">Open another link</a></div>
+  </section>
+
+  <section id="doc" hidden>
+    <a class="backlink" id="back" href="previews.html" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 6.5 9 12l5.5 5.5"/></svg>My previews</a>
+    <h1 tabindex="-1">Open shared document</h1>
+    <div class="doctools">
+      <span class="fileic" id="docIc" aria-hidden="true"></span>
+      <div class="docname"><b id="docName"></b><span id="docMeta"></span></div>
+      <div class="seg" id="zoom" role="group" aria-label="Zoom">
+        <button type="button" data-zoom="fit" aria-pressed="true">Fit</button><button type="button" data-zoom="1" aria-pressed="false">100%</button>
+      </div>
+    </div>
+    <p class="ownnote" id="ownNote" hidden></p>
+    <div class="viewer" id="viewer" tabindex="0" aria-label="The shared document"></div>
+  </section>
+</main>
+</body>
+</html>

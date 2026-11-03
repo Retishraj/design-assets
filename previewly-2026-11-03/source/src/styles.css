@@ -1,0 +1,299 @@
+/* Previewly landing page: the story's own styles (the bar, the rail, the stage, the sets, the copy). The tokens,
+   Geist, the header and the buttons are in base.css, shared with the app pages; index.html links both. The art is one
+   1100×720 frame, scaled to fit above the copy (layout.js); everything in it is placed in frame pixels. */
+/* the landing's header on a phone: the sound switch (off by default) gives way to View and Upload */
+@media (max-width:420px){#sound{display:none}}
+
+/* ---------- pinned URL bar ---------- */
+.bar{position:fixed;z-index:35;left:0;right:0;margin:0 auto;top:calc(var(--top) + env(safe-area-inset-top,0px) + 4px);width:min(560px,calc(100vw - 2 * var(--pad)));height:48px;
+  display:flex;align-items:center;gap:10px;padding:0 8px 0 16px;border-radius:999px;overflow:hidden;
+  background:var(--surface);border:1px solid var(--hair);box-shadow:var(--shadow-lg);font-family:var(--font);font-size:14px;transition:border-color .3s,box-shadow .3s}
+/* the progress line: a slim track inside the pill, clear of its border and rounded ends. The upload fills it cobalt
+   to cyan with a soft glow and a glint running along while it advances (bar.js moves it, only then); checking the
+   files sweeps it green; then it fades. --p and --c (0..1) are set by bar.js; the clip's rounded right edge is the
+   leading edge */
+.prog{position:absolute;left:18px;right:18px;bottom:4px;height:2px;border-radius:2px;pointer-events:none;opacity:0;
+  background:color-mix(in srgb,var(--laser-a) 14%,transparent);--p:0;--c:0}
+.prog-fill,.prog-check{position:absolute;inset:0;border-radius:2px;overflow:hidden}
+.prog-fill{background:linear-gradient(90deg,var(--laser-a),var(--laser-mid) 60%,var(--laser-b));
+  box-shadow:0 0 5px color-mix(in srgb,var(--laser-b) 55%,transparent),0 0 10px color-mix(in srgb,var(--laser-a) 22%,transparent);
+  clip-path:inset(-10px calc((1 - var(--p)) * 100%) -10px -10px round 2px)}
+.prog-check{background:var(--ok);box-shadow:0 0 6px color-mix(in srgb,var(--ok) 50%,transparent);
+  clip-path:inset(-10px calc((1 - var(--c)) * 100%) -10px -10px round 2px)}
+.prog-glint{position:absolute;inset:0;transform:translateX(-100%);opacity:0;transition:opacity .3s;
+  background:linear-gradient(90deg,transparent 42%,rgba(255,255,255,.85) 50%,transparent 58%)}
+.prog.running .prog-glint{opacity:1}
+@media (max-width:520px){.prog{left:16px;right:16px;bottom:3px}}
+.bar.beaming{border-color:color-mix(in srgb,var(--laser-b) 55%,transparent);animation:beam 1.4s ease-in-out infinite}
+@keyframes beam{0%,100%{box-shadow:0 0 0 0 transparent,var(--shadow-lg)}50%{box-shadow:0 0 0 4px color-mix(in srgb,var(--laser-b) 20%,transparent),0 10px 42px -6px color-mix(in srgb,var(--laser-b) 55%,transparent),var(--shadow-lg)}}
+.bar>*:not(.prog){position:relative}
+.bar .lock{width:16px;height:16px;flex:none;color:var(--muted);transition:color .3s}
+.bar.locked{border-color:color-mix(in srgb,var(--accent) 45%,transparent);box-shadow:0 0 0 4px var(--accent-soft),var(--shadow-lg)}
+.bar.locked .lock{color:var(--accent)}
+.url{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink);letter-spacing:-.01em}
+.url.muted{color:var(--muted)}
+.caret{display:inline-block;width:2px;height:1.15em;margin-left:1px;vertical-align:-.2em;background:var(--accent);animation:blink 1.05s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.status{display:flex;align-items:center;gap:6px;flex:none}
+.chip{display:inline-flex;align-items:center;gap:5px;height:30px;padding:0 11px;border-radius:999px;font-size:12px;font-family:var(--font);white-space:nowrap;
+  background:var(--bg);color:var(--muted)}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}
+.chip.blue{background:var(--accent-soft);color:var(--accent-text)}
+.chip svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.copybtn{height:32px;border:0;border-radius:999px;padding:0 14px;background:var(--cta);color:var(--on-accent);font:550 13px var(--font);cursor:pointer}
+@media (max-width:520px){.bar{height:44px;font-size:12.5px;padding-left:13px}.bar .long{display:none}.chip{height:28px;padding:0 9px;font-size:11px}}
+
+/* ---------- side progress rail ---------- */
+.rail{position:fixed;z-index:30;left:calc(var(--pad) - 4px);top:50%;transform:translateY(-50%)}
+.rail ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:22px;position:relative}
+.rail button{display:flex;align-items:center;gap:12px;height:20px;padding:0;border:0;background:none;cursor:pointer;color:var(--muted)}
+.rail .dot{width:20px;height:20px;display:grid;place-items:center;flex:none;position:relative}
+.rail .dot::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--line);transition:background .3s,transform .3s,box-shadow .3s}
+.rail button:hover .dot::before{background:var(--faint);transform:scale(1.25)}
+.rail button.done .dot::before{background:var(--accent)}
+.rail button[aria-current="step"] .dot::before{background:var(--laser-b);transform:scale(1.5);box-shadow:0 0 0 4px color-mix(in srgb,var(--laser-b) 18%,transparent),0 0 14px 2px var(--laser-b)}
+.rail .tip{font-size:12.5px;font-weight:500;white-space:nowrap;padding:5px 10px;border-radius:999px;background:var(--surface);border:1px solid var(--hair);box-shadow:var(--shadow);
+  color:var(--ink);opacity:0;transform:translateX(-6px);pointer-events:none;transition:opacity .25s,transform .35s cubic-bezier(.2,.8,.2,1)}
+.rail .tip b{font-family:var(--font);font-weight:500;font-size:11px;color:var(--accent-text);margin-right:5px}
+.rail button[aria-current="step"] .tip,.rail button:hover .tip,.rail button:focus-visible .tip{opacity:1;transform:none}
+.railfx{position:absolute;pointer-events:none;z-index:1}
+.rail ol{z-index:2}
+.rail .fill,.rail .head{visibility:hidden}
+.rail .track{position:absolute;left:9.25px;top:10px;bottom:10px;width:1.5px;border-radius:2px;background:var(--line);pointer-events:none}
+.rail .fill{position:absolute;inset:0 -0.5px;transform-origin:50% 0;transform:scaleY(0);border-radius:2px;
+  background:linear-gradient(to bottom,var(--laser-a),var(--laser-mid) 55%,var(--laser-b));
+  box-shadow:0 0 4px 0 color-mix(in srgb,var(--laser-b) 70%,transparent),0 0 12px 1px color-mix(in srgb,var(--laser-mid) 45%,transparent),0 0 26px 3px color-mix(in srgb,var(--laser-a) 30%,transparent)}
+.rail .fill::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;margin-left:-.5px;background:var(--laser-core);opacity:.85;border-radius:1px}
+.rail .head{position:absolute;left:50%;top:0;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:var(--laser-core);
+  box-shadow:0 0 0 1.5px var(--laser-b),0 0 10px 3px var(--laser-b),0 0 30px 8px color-mix(in srgb,var(--laser-mid) 55%,transparent);will-change:transform}
+.rail .head::before{content:"";position:absolute;left:50%;bottom:50%;width:2.5px;height:var(--tail,0px);margin-left:-1.25px;border-radius:3px;
+  background:linear-gradient(to top,var(--laser-core),var(--laser-b) 22%,color-mix(in srgb,var(--laser-mid) 60%,transparent) 55%,transparent);opacity:calc(.35 + var(--glow,0) * .65);
+  box-shadow:0 0 10px 1px color-mix(in srgb,var(--laser-b) 60%,transparent)}
+.rail .head::after{content:"";position:absolute;inset:-16px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--laser-b) 60%,transparent),transparent);
+  opacity:var(--glow,0);transition:opacity .3s}
+@media (max-width:700px){.rail{left:6px}.rail ol{gap:16px}.rail .tip{display:none}.rail button{height:16px}.rail .dot{width:16px;height:16px}.rail .track{left:7.25px;top:8px;bottom:8px}}
+
+/* ---------- stage ---------- */
+.track-scroll{position:relative}
+.stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;isolation:isolate}
+.backdrop{position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(120% 70% at 50% -10%,var(--bg-hi),transparent 60%),linear-gradient(to bottom,var(--bg),var(--bg) 62%,var(--floor))}
+.horizon{display:none}
+.halo-rig{position:absolute;inset:0;will-change:transform,opacity}
+.halo{position:absolute;left:var(--hx,50%);top:var(--hy,45%);width:var(--hs,640px);height:var(--hs,640px);margin:calc(var(--hs,640px) / -2) 0 0 calc(var(--hs,640px) / -2);
+  border-radius:50%;opacity:0;will-change:transform,opacity;
+  background:radial-gradient(closest-side,var(--halo-core),var(--halo) 38%,color-mix(in srgb,var(--halo) 30%,transparent) 62%,transparent)}
+.halo::after{content:"";position:absolute;inset:18%;border-radius:50%;border:1px solid color-mix(in srgb,var(--accent) 22%,transparent);opacity:.6;animation:breathe 6s ease-in-out infinite}
+@keyframes breathe{50%{transform:scale(1.04);opacity:.35}}
+
+.frame{position:absolute;left:0;top:0;width:1100px;height:720px;transform-origin:0 0;pointer-events:none}
+.scene{position:absolute;inset:0;perspective:1800px;perspective-origin:50% 42%}
+.camera{position:absolute;inset:0;transform-style:preserve-3d}
+.obj{position:absolute;left:0;top:0;transform-style:preserve-3d;backface-visibility:hidden}
+.cut{position:absolute;display:block;user-select:none;-webkit-user-drag:none;pointer-events:none;max-width:none}
+
+/* ---------- objects in the scene ---------- */
+.rig{will-change:transform}
+.pouchrig{transform-origin:50% 92%}
+.pouchgl,.pouchstill{position:absolute;left:0;top:0;-webkit-box-reflect:below 0 linear-gradient(transparent 76%,rgba(0,0,0,var(--reflect)))}
+.pullsprite{position:absolute;left:0;top:0;will-change:transform;filter:drop-shadow(0 3px 4px rgba(10,20,60,.18))}
+.pullsprite .cut{left:0;top:0}
+/* the logomark on the pull's tab: white, faintly debossed into the glossy cobalt */
+.pulllogo{position:absolute;display:block;color:#fff;opacity:.96;filter:drop-shadow(0 .5px .3px rgba(0,22,96,.45))}
+.pulllogo svg{display:block;width:100%;height:100%}
+.bagrig .bagbase,.bagrig .bagbox,.bagrig .bagtop{position:absolute;left:0;top:0;transform-style:preserve-3d}
+.tile{position:absolute}
+.tilein{position:absolute;inset:0;will-change:transform,opacity}
+.tilein .cut{left:0;top:0}
+
+/* the stage (stage.js): the floor plane, contact shadows, reflections, light motes */
+.floorplane{position:absolute;left:-1250px;top:612px;width:3600px;height:2700px;transform-origin:50% 0 0;pointer-events:none}
+.contact{position:absolute;border-radius:50%;transform-origin:50% 0;transform:rotateX(90deg) translateY(-50%);pointer-events:none;
+  background:radial-gradient(closest-side,var(--contact),color-mix(in srgb,var(--contact) 55%,transparent) 30%,color-mix(in srgb,var(--contact) 16%,transparent) 65%,transparent)}
+/* under a floating object the floor is seen almost edge-on, where a pool lying on it thins to a hard line: there the
+   shadow is a soft ellipse facing the camera, on the floor line */
+.contact.far{transform:translateY(-50%);opacity:.42}
+.bagbase .cut,.padlock .cut{-webkit-box-reflect:below 0 linear-gradient(transparent 74%,rgba(0,0,0,var(--reflect)))}
+.mote{position:absolute;left:0;top:0;border-radius:50%;pointer-events:none;opacity:var(--o);
+  background:radial-gradient(circle,var(--mote-core),var(--mote) 40%,transparent 70%);animation:twinkle 6s ease-in-out infinite}
+@keyframes twinkle{50%{opacity:calc(var(--o) * .35)}}
+
+/* the glass panes (sets.js): a face with a screen, a sheen, two thickness edges and a tag */
+.pane{transform-style:preserve-3d;will-change:transform,opacity}
+.pane .face{position:absolute;inset:0;will-change:transform;border-radius:32px;padding:18px;background:var(--pane-back);
+  box-shadow:0 40px 80px -30px var(--pane-shadow),0 18px 30px -18px var(--pane-shadow)}
+/* the rendered glass rim: corners and bevels from the render, the straight runs stretched (9-slice), clear inside */
+.pane .rim{position:absolute;inset:0;border:38px solid transparent;border-image-slice:172;border-image-width:38px;border-image-repeat:stretch;pointer-events:none}
+.pane .slot{position:relative;width:600px;height:375px;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 0 0 1px rgba(20,30,50,.08)}
+.pane .screen{position:absolute;left:0;top:0;overflow:hidden}
+.mkwrap{position:absolute;left:0;top:0;transform-origin:0 0}
+.pane .sheen{position:absolute;inset:18px;border-radius:14px;pointer-events:none;
+  background:linear-gradient(118deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,0) 22%,rgba(255,255,255,0) 64%,rgba(255,255,255,.18) 78%,rgba(255,255,255,0) 90%);mix-blend-mode:soft-light}
+:root[data-theme="dark"] .pane .sheen{opacity:.5}
+.pane .edge{position:absolute;background:linear-gradient(to bottom,rgba(255,255,255,.9),rgba(196,226,242,.85))}
+:root[data-theme="dark"] .pane .edge{background:linear-gradient(to bottom,rgba(200,235,255,.45),rgba(90,150,200,.35))}
+.pane .edge.r{top:26px;bottom:26px;right:0;width:12px;transform-origin:100% 50%;transform:rotateY(90deg);border-radius:0 6px 6px 0}
+.pane .edge.b{left:26px;right:26px;bottom:0;height:12px;transform-origin:50% 100%;transform:rotateX(-90deg);border-radius:0 0 6px 6px;opacity:.8}
+.ptag{position:absolute;left:14px;top:-34px;display:flex;align-items:center;gap:8px;height:26px;padding:0 11px 0 9px;border-radius:999px;font:500 12px var(--font);white-space:nowrap;
+  background:var(--ink);color:var(--bg);box-shadow:var(--shadow);transform:translateZ(1px)}
+.ptag b{font-weight:600}
+.ptag span{color:color-mix(in srgb,var(--bg) 62%,transparent);font-family:var(--font);font-weight:500}
+.p-dash .ptag{left:auto;right:14px}
+.pane.viewing .ptag{background:var(--accent);color:#fff;box-shadow:0 0 0 4px var(--accent-soft),var(--shadow)}
+.pane.viewing .ptag span{color:rgba(255,255,255,.75)}
+.pane .pick{will-change:opacity}
+.p-hero .ptag::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px color-mix(in srgb,var(--ok) 30%,transparent)}
+.pane .frost .mkwrap{filter:blur(20px) saturate(.85)}
+.pane .frost,.pane .veil,.pane .v2{will-change:opacity}
+.pane .veil{position:absolute;inset:0;background:linear-gradient(160deg,rgba(255,255,255,.72),rgba(236,240,246,.6));pointer-events:none}
+:root[data-theme="dark"] .pane .veil{background:linear-gradient(160deg,rgba(30,34,46,.45),rgba(20,24,34,.4))}
+.p-hero.unlocked .frost,.p-hero.unlocked .veil{visibility:hidden}
+.pane .wipe{position:absolute;inset:0;overflow:hidden;will-change:transform}
+.pane .wipein{position:absolute;inset:0;will-change:transform}
+.pane .beam{position:absolute;left:0;top:-30px;bottom:-30px;width:3px;margin-left:-1.5px;will-change:transform,opacity;border-radius:3px;pointer-events:none;
+  background:linear-gradient(to bottom,transparent,var(--laser-a) 10%,var(--laser-b) 42%,var(--laser-core) 50%,var(--laser-b) 58%,var(--laser-a) 90%,transparent);
+  box-shadow:0 0 6px 1px var(--laser-b),0 0 22px 5px color-mix(in srgb,var(--laser-b) 60%,transparent),0 0 60px 14px color-mix(in srgb,var(--laser-a) 40%,transparent)}
+.pane .rings{position:absolute;inset:0;pointer-events:none;will-change:opacity}
+.pane .ring{position:absolute;border-radius:7px;border:1.5px solid var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent),0 0 18px 2px color-mix(in srgb,var(--accent) 45%,transparent);
+  will-change:opacity;animation:ringpulse 2.4s ease-in-out infinite}
+.pane .ring span{position:absolute;left:-1.5px;top:-19px;height:17px;padding:0 6px;border-radius:5px;background:var(--accent);color:#fff;font:600 10px/17px var(--font);letter-spacing:.01em}
+@keyframes ringpulse{50%{opacity:.45}}
+
+/* the padlock (plate 04) and the devices (plate 06) */
+.padlock{will-change:transform,opacity}
+.padlock .cut{left:0;top:0}
+.devices{will-change:transform,opacity}
+.device{position:absolute;will-change:transform}
+.device>.cut{left:0;top:0}
+.dscreen{position:absolute;left:0;top:0;transform-origin:0 0;overflow:hidden;background:#0d1117;backface-visibility:hidden}
+.dscreen .dpage{position:absolute;left:0;top:0;transform-origin:0 0}
+.dscreen .boot{position:absolute;inset:0;background:radial-gradient(120% 80% at 30% 10%,#2a3448,#0b0f18 70%)}
+.device.phone .dscreen{border-radius:23px}
+.device.tablet .dscreen{border-radius:13px}
+.device.laptop .dscreen{border-radius:3px 3px 0 0}
+.dscreen .notch{position:absolute;left:50%;top:5px;width:122px;height:35px;margin-left:-61px;border-radius:20px;background:#05070a;transform-origin:50% 0}
+.dscreen .flash{position:absolute;inset:0;background:radial-gradient(90% 70% at 50% 0%,#fff,#cfe0ff 40%,rgba(43,108,246,.4));opacity:0;pointer-events:none}
+.streams{position:absolute;left:0;top:0;z-index:3;pointer-events:none}
+.anchor{position:absolute;width:2px;height:2px;margin:-1px 0 0 -1px;pointer-events:none}
+
+/* ---------- copy ---------- */
+.copies{position:absolute;left:0;right:0;bottom:calc(var(--copy-bottom,44px) + env(safe-area-inset-bottom,0px));z-index:5;pointer-events:none}
+.copy{position:absolute;left:50%;bottom:0;width:min(900px,calc(100vw - 2 * var(--pad) - 24px));transform:translateX(-50%);text-align:center;visibility:hidden}
+.copy.on{visibility:visible;pointer-events:auto}
+.eyebrow{margin:0 0 14px;font-family:var(--font);font-size:13px;font-weight:500;letter-spacing:.005em;color:var(--accent-text)}
+.copy h1,.copy h2{margin:0;font-weight:600;font-size:clamp(34px,4.1vw,62px);line-height:1.02;letter-spacing:-.042em;text-wrap:balance;color:var(--ink)}
+.copy .lead{margin:16px auto 0;max-width:560px;font-size:clamp(16px,1.25vw,18.5px);line-height:1.5;letter-spacing:-.01em;color:var(--muted);text-wrap:pretty}
+.copy .hint{margin:18px 0 0;display:inline-flex;align-items:center;gap:9px;font-family:var(--font);font-size:12.5px;color:var(--faint)}
+.copy .hint i{width:9px;height:16px;border-radius:4px;background:#fff;border:1px solid var(--line);position:relative}
+.copy .hint i::after{content:"";position:absolute;left:2px;top:2.5px;width:3px;height:3px;border-radius:50%;background:var(--accent)}
+.ctas{margin-top:22px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.ctas .cta,.ctas .btn{height:46px;padding:0 22px;font-size:15px}
+.ln-mask{padding:0 .04em .1em;margin:0 -.04em -.1em}
+@media (max-width:700px){.eyebrow{margin-bottom:10px;font-size:11.5px}.copy .lead{margin-top:12px}.ctas{margin-top:16px}.ctas .cta,.ctas .btn{height:42px;padding:0 16px;font-size:14px}}
+
+/* ---------- page elements over the art ---------- */
+.ui{position:absolute;inset:0;z-index:4;pointer-events:none}
+.ui>*{position:absolute;left:0;top:0}
+.counter{display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 13px;border-radius:999px;font:500 12.5px var(--font);white-space:nowrap;
+  background:var(--ok-soft);color:var(--ok);border:1px solid color-mix(in srgb,var(--ok) 22%,transparent);opacity:0}
+.counter svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
+.filechip{position:absolute;left:0;top:0;display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px 0 7px;border-radius:999px;font:500 11px var(--font);white-space:nowrap;
+  background:var(--surface);color:var(--ink);border:1px solid var(--hair);box-shadow:var(--shadow);opacity:0;transition:background .3s,color .3s}
+.filechip i{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--line);flex:none;transition:all .3s;display:grid;place-items:center}
+.filechip.ok i{background:var(--ok);border-color:var(--ok)}
+.filechip.ok i::after{content:"";width:5px;height:3px;border:solid #fff;border-width:0 0 1.5px 1.5px;transform:translateY(-.5px) rotate(-45deg)}
+.filechip.entry{background:var(--accent);color:#fff;border-color:transparent}
+.filechip.entry i{border-color:rgba(255,255,255,.6)}
+.filechip.entry.ok i{background:#fff;border-color:#fff}
+.filechip.entry.ok i::after{border-color:var(--accent)}
+.filechip .tag{font-size:9.5px;padding:2px 6px;border-radius:999px;background:rgba(255,255,255,.2);margin-left:2px}
+
+/* keypad (chapter 4) */
+.keypad{will-change:transform,opacity;width:300px;padding:22px 22px 18px;border-radius:24px;background:var(--card);border:1px solid var(--glass-line);box-shadow:var(--shadow-lg);
+  text-align:center;opacity:0;visibility:hidden;transform-origin:50% 50%}
+.keypad.live{pointer-events:auto}
+.keypad .badge{width:40px;height:40px;margin:0 auto 12px;border-radius:12px;display:grid;place-items:center;background:var(--accent-soft)}
+.keypad .badge svg{width:22px;height:22px}
+.keypad .badge rect{fill:var(--accent)}
+.keypad .badge .shackle{fill:none;stroke:var(--accent);stroke-width:2.6;stroke-linecap:round;transition:transform .45s cubic-bezier(.16,1,.3,1);transform-origin:21px 14px}
+.keypad.good .badge .shackle{transform:translateY(-3px) rotate(28deg)}
+.keypad.good .badge{background:var(--ok-soft)}
+.keypad.good .badge rect{fill:var(--ok)}
+.keypad.good .badge .shackle{stroke:var(--ok)}
+.keypad h3{margin:0;font-size:16px;font-weight:600;letter-spacing:-.02em}
+.keypad p{margin:4px 0 0;font-size:13px;color:var(--muted)}
+.keypad .dots{display:flex;justify-content:center;gap:10px;margin:14px 0 16px}
+.keypad .dots i{width:10px;height:10px;border-radius:50%;border:1.5px solid var(--line);transition:all .2s}
+.keypad .dots i.on{background:var(--accent);border-color:var(--accent);transform:scale(1.08)}
+.keypad.good .dots i{background:var(--ok);border-color:var(--ok)}
+.keypad .keys{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.keypad .keys button{height:46px;border-radius:14px;border:1px solid var(--hair);background:var(--surface);font:500 18px var(--font);font-variant-numeric:tabular-nums;cursor:pointer;
+  transition:transform .1s,background .2s,border-color .2s}
+.keypad .keys button:hover{border-color:var(--line)}
+.keypad .keys button:active{transform:scale(.95);background:var(--accent-soft)}
+.keypad .keys .zero{grid-column:2}
+.keypad .keys .del{display:grid;place-items:center;color:var(--muted)}
+.keypad .keys .del svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
+.keypad .relock{display:none;margin:12px auto 0;border:0;background:none;color:var(--accent-text);font-size:13px;font-weight:500;cursor:pointer}
+.keypad.good .relock{display:block}
+.keypad .hint{margin-top:10px;font:12px var(--font);color:var(--faint)}
+.keypad.shake{animation:shake .38s cubic-bezier(.36,.07,.19,.97)}
+@keyframes shake{20%{translate:-7px 0}40%{translate:6px 0}60%{translate:-4px 0}80%{translate:2px 0}}
+.keypad.compact{width:264px;padding:16px 16px 12px}
+.keypad.compact .badge{display:none}
+.keypad.compact .keys button{height:40px}
+.keypad.compact .dots{margin:10px 0 12px}
+
+/* the update (chapter 5) */
+.deploy{will-change:transform,opacity;width:300px;padding:14px 14px 12px;border-radius:18px;background:var(--card);border:1px solid var(--glass-line);box-shadow:var(--shadow-lg);opacity:0;font-size:13px}
+.deploy .dhead{display:flex;align-items:center;justify-content:space-between;gap:8px;font-family:var(--font);font-size:12.5px}
+.deploy .zip{display:inline-flex;align-items:center;gap:8px;color:var(--ink)}
+.deploy .zip svg{width:18px;height:18px;fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.6;stroke-linecap:round}
+.deploy .pct{color:var(--accent-text);font-variant-numeric:tabular-nums}
+.deploy .dbar{height:5px;margin:11px 0 12px;border-radius:9px;background:var(--hair);overflow:hidden}
+.deploy .dbar i{display:block;height:100%;width:100%;transform-origin:0 50%;transform:scaleX(0);border-radius:9px;background:linear-gradient(90deg,var(--accent),var(--accent-hi));box-shadow:0 0 12px var(--accent)}
+.deploy .steps{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+.deploy .steps li{display:flex;align-items:center;gap:8px;color:var(--faint);transition:color .3s}
+.deploy .steps li::before{content:"";width:14px;height:14px;border-radius:50%;border:1.5px solid var(--line);flex:none;transition:all .3s;box-sizing:border-box}
+.deploy .steps li.on{color:var(--ink)}
+.deploy .steps li.on::before{border:4px solid var(--ok);background:var(--surface)}
+.deploy.compact{width:min(320px,calc(100vw - 2 * var(--pad)));padding:10px 12px}
+.deploy.compact .steps{display:none}
+.deploy.compact .dbar{margin:8px 0 0}
+.versions{display:flex;gap:3px;padding:4px;border-radius:999px;background:var(--card);border:1px solid var(--glass-line);box-shadow:var(--shadow-lg);opacity:0;visibility:hidden}
+.versions.live{pointer-events:auto}
+.versions button{height:34px;padding:0 14px;border:0;border-radius:999px;background:none;font:500 12.5px var(--font);color:var(--muted);cursor:pointer;white-space:nowrap;transition:background .25s,color .25s}
+.versions button b{font-weight:600;margin-right:4px;color:inherit}
+.versions button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+
+
+/* the zipper pull: an invisible handle over the pull in the art, so it can be dragged and focused */
+.pull{position:absolute;left:0;top:0;width:56px;height:96px;z-index:6;border-radius:18px;cursor:grab;touch-action:none;-webkit-tap-highlight-color:transparent}
+.pull:focus-visible{outline-offset:0}
+body.dragging .pull{cursor:grabbing}
+
+/* before main.js has run: the chrome waits, so the intro can bring it in */
+body.booting .top,body.booting .bar,body.booting .rail,body.booting .copies{opacity:0}
+
+/* ---------- glass: the interface's components are frosted glass over the scene ---------- */
+.bar,.rail .tip,.keypad,.deploy,.versions,.counter,.filechip{
+  background:var(--g-fill);border:1px solid var(--g-edge);-webkit-backdrop-filter:var(--g-blur);backdrop-filter:var(--g-blur)}
+.bar{box-shadow:var(--g-hi),var(--shadow-lg)}
+.rail .tip,.filechip{box-shadow:var(--g-hi),var(--shadow)}
+.keypad,.deploy,.versions{box-shadow:var(--g-hi),var(--shadow-lg)}
+.keypad .keys button{background:var(--g-key);border:1px solid var(--g-edge);box-shadow:var(--g-hi),0 2px 6px -2px rgba(16,24,40,.12)}
+.keypad .keys button:active{background:var(--accent-soft)}
+.keypad .badge{background:color-mix(in srgb,var(--accent) 14%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 22%,transparent)}
+.counter{background:linear-gradient(160deg,color-mix(in srgb,var(--ok) 16%,transparent),color-mix(in srgb,var(--ok) 8%,transparent));border-color:color-mix(in srgb,var(--ok) 28%,transparent);box-shadow:var(--g-hi),var(--shadow)}
+.filechip.entry{background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 92%,#fff),var(--accent));border-color:color-mix(in srgb,var(--accent) 60%,#fff)}
+.versions button[aria-pressed="true"]{background:var(--ink);color:var(--bg);box-shadow:0 2px 10px -2px rgba(0,0,0,.25)}
+.chip{background:color-mix(in srgb,var(--ink) 6%,transparent);box-shadow:inset 0 0 0 1px var(--g-line)}
+.chip.ok{background:color-mix(in srgb,var(--ok) 14%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ok) 22%,transparent)}
+.chip.blue{background:color-mix(in srgb,var(--accent) 12%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 22%,transparent)}
+/* inside the 3D scene backdrop blur isn't available: the pane tags are glass without it */
+.ptag{background:linear-gradient(160deg,rgba(21,23,28,.86),rgba(21,23,28,.74));box-shadow:inset 0 1px 0 rgba(255,255,255,.12),var(--shadow)}
+:root[data-theme="dark"] .ptag{background:linear-gradient(160deg,rgba(245,247,250,.92),rgba(225,230,240,.82));box-shadow:inset 0 1px 0 #fff,var(--shadow)}
+
+@media (prefers-reduced-motion:reduce){
+  .caret,.halo::after,.bar.beaming,.pane .ring,.mote{animation:none}
+}

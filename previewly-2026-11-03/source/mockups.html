@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Northvale mockups</title>
+<!-- Dev-only review page for src/mockups (not part of the build: Vite only takes index.html).
+     Query: ?only=landing|dashboard1|dashboard2|dashboard3|statement|landingTablet|dashboardPhone (bare, at 0,0),
+            ?scale=0.4 (draw every mockup scaled), ?new (outline the data-new elements). -->
+<style>
+  @font-face{font-family:'Geist';src:url('/src/fonts/Geist-Variable.woff2') format('woff2');font-weight:100 900;font-style:normal;font-display:block}
+  html,body{margin:0}
+  body{background:#DCDFE4;color:#2B2F36;font:14px/1.4 system-ui,sans-serif;padding:32px}
+  body.bare{padding:0;background:#fff}
+  .item{margin:0 0 56px}
+  .label{display:flex;gap:12px;align-items:baseline;margin:0 0 12px;font-weight:600;font-size:14px}
+  .label span{font-weight:400;color:#6A717C;font-size:13px}
+  .frame{position:relative;overflow:hidden}
+  .frame > .scaler{transform-origin:0 0}
+  body.shownew [data-new]{outline:2px solid #2B6CF6;outline-offset:2px}
+  body.shownew [data-new]::after{content:attr(data-new)}
+</style>
+<link rel="stylesheet" href="/src/mockups/mockups.css">
+</head>
+<body>
+<script type="module">
+  import { landing, dashboard, statement, landingTablet, dashboardPhone } from '/src/mockups/mockups.js';
+  const list = [
+    ['landing', 'landing()', 1440, 900, landing],
+    ['dashboard1', 'dashboard(1)', 1440, 900, () => dashboard(1)],
+    ['dashboard2', 'dashboard(2)', 1440, 900, () => dashboard(2)],
+    ['dashboard3', 'dashboard(3)', 1440, 900, () => dashboard(3)],
+    ['statement', 'statement()', 1440, 900, statement],
+    ['landingTablet', 'landingTablet()', 820, 1180, landingTablet],
+    ['dashboardPhone', 'dashboardPhone()', 390, 844, dashboardPhone],
+  ];
+  const q = new URLSearchParams(location.search);
+  const only = q.get('only');
+  const scale = parseFloat(q.get('scale') || '1') || 1;
+  if (q.has('new')) document.body.classList.add('shownew');
+  if (only) document.body.classList.add('bare');
+  let html = '';
+  for (const [key, label, w, h, fn] of list) {
+    if (only && only !== key) continue;
+    const frame = `<div class="frame" style="width:${Math.round(w * scale)}px;height:${Math.round(h * scale)}px">` +
+      `<div class="scaler" style="transform:scale(${scale})">${fn()}</div></div>`;
+    html += only ? frame : `<section class="item"><div class="label">${label}<span>${w} × ${h}${scale !== 1 ? `, shown at ${scale * 100}%` : ''}</span></div>${frame}</section>`;
+  }
+  document.body.insertAdjacentHTML('beforeend', html);
+  const n = [...document.querySelectorAll('.mk')].map((m) => `${m.className}: ${m.querySelectorAll('*').length + 1}`);
+  console.log('element counts\n' + n.join('\n'));
+  if (q.has('check')) {                         // ?check: list clipped text and elements outside their mockup
+    const out = [n.join('\n')];
+    for (const mk of document.querySelectorAll('.mk')) {
+      for (const el of mk.querySelectorAll('*')) {
+        if (el.closest('svg') && el.tagName !== 'svg') continue;
+        const hasText = [...el.childNodes].some((c) => c.nodeType === 3 && c.textContent.trim());
+        if (hasText && el.scrollWidth > el.clientWidth + 1 && getComputedStyle(el).display !== 'inline')
+          out.push(`clipped ${mk.classList[1]} .${el.className} "${el.textContent.trim().slice(0, 40)}" ${el.scrollWidth}>${el.clientWidth}`);
+        const fs = parseFloat(getComputedStyle(el).fontSize);
+        if (hasText && (fs < 12 || fs % 1)) out.push(`font ${mk.classList[1]} .${el.className} ${fs}px "${el.textContent.trim().slice(0, 30)}"`);
+      }
+    }
+    document.body.insertAdjacentHTML('beforeend', `<pre class="report">${out.join('\n')}</pre>`);
+  }
+</script>
+</body>
+</html>
